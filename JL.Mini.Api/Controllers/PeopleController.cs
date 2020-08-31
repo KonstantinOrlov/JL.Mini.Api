@@ -6,17 +6,21 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using JL.Mini.Api.Model;
+using Microsoft.AspNetCore.Authorization;
 
-namespace JL.Mini.Api.Controller
+namespace JL.Mini.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class PeopleController : ControllerBase
     {
+        private readonly IJwtAuthenticationManager jwt;
         private readonly Context _context;
 
-        public PeopleController(Context context)
+        public PeopleController(Context context, IJwtAuthenticationManager jwt)
         {
+            this.jwt = jwt;
             _context = context;
         }
 
@@ -99,6 +103,18 @@ namespace JL.Mini.Api.Controller
             await _context.SaveChangesAsync();
 
             return person;
+        }
+
+        
+        [AllowAnonymous]
+        [HttpPost("authenticate")]
+        public IActionResult Authenticate([FromBody] Person person)
+        {
+            var token = jwt.Authenticate(person.Login, person.Password);
+
+            if (token == null)
+                return Unauthorized();
+            return Ok(token);
         }
 
         private bool PersonExists(int id)

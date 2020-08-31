@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using JL.Mini.Api.Model;
 using System.Net.Mime;
 
-namespace JL.Mini.Api.Controller
+namespace JL.Mini.Api.Controllers
 {
     [Route("api/[controller]")]
     [Produces("application/json", "application/xml")]
